@@ -52,11 +52,11 @@
 
 ### Exercise 3.1: Railway deployment
 - URL: https://new-project-production-6d7d.up.railway.app/
-- Screenshot: ./images/railway.png
+- Screenshot: ./screenshots/railway.png
 
 ### Exercise 3.2: Deploy Render
 - URL: https://ai-agent-rvl9.onrender.com/
-- Screenshot: ./images/render.png
+- Screenshot: ./screenshots/render.png
 
 ## Part 4: API Security
 
@@ -71,7 +71,7 @@ Request bị chặn ngay, không chạy tới /ask
 Thay đổi key trong env var, restart app
 
 ### Exercise 4.2:
-- Screenshot: ./images/jwt.png
+- Screenshot: ./screenshots/jwt.png
 
 ### Exercise 4.3:
 1. Algorithm nào?
@@ -86,7 +86,7 @@ Sliding Window. Cách hoạt động: mỗi request lưu timestamp vào deque, k
 
 3. JWT token chứa role, khi verify token trả về role → app chọn đúng limiter. Muốn user student có limit cao hơn thì phải đổi role thành admin lúc tạo token
 
-- Screenshot: ./images/rate-limit.png
+- Screenshot: ./screenshots/rate-limit.png
 
 ### Exercise 4.4: Cost guard implementation
 - Kết nối Redis local
@@ -97,3 +97,36 @@ Sliding Window. Cách hoạt động: mỗi request lưu timestamp vào deque, k
 ## Part 5: Scaling & Reliability
 
 ### Exercise 5.1-5.5: Implementation notes
+- Health checks
+
+Implement 2 endpoints:
+
+/health — Liveness probe: chỉ cần return 200, để platform biết process còn sống
+/ready — Readiness probe: check Redis + DB ping, return 503 nếu chưa sẵn sàng nhận traffic
+Khác nhau: /health fail → restart container. /ready fail → ngừng gửi traffic vào instance đó.
+
+- Graceful shutdown
+
+Xử lý signal SIGTERM (lệnh tắt từ Docker/Railway):
+signal.signal(signal.SIGTERM, shutdown_handler)
+Thay vì tắt ngay → hoàn thành request đang chạy rồi mới thoát. Tránh user nhận lỗi giữa chừng.
+
+- Stateless design
+
+Không lưu state trong memory của app:
+Memory — mất khi restart hoặc scale
+conversation_history = {}
+
+Redis — mọi instance đều đọc được
+history = r.lrange(f"history:{user_id}", 0, -1)
+Khi scale ra 3 instances, mỗi instance có RAM riêng → request 1 vào instance A, request 2 vào instance B sẽ mất context nếu dùng memory.
+
+- Load balancing
+
+docker compose up --scale agent=3
+Nginx nhận traffic rồi phân tán đều sang 3 container agent. Nếu 1 instance crash → Nginx tự bỏ qua, gửi sang instance còn lại.
+
+- Test stateless
+
+python test_stateless.py
+Script tự động: tạo conversation → kill random instance → gọi tiếp → kiểm tra conversation còn không. Nếu stateless đúng → vẫn còn vì state ở Redis, không ở instance bị kill.
