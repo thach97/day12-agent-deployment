@@ -1,13 +1,11 @@
 import time
 import uuid
 
-import redis as redis_lib
 from fastapi import Depends, HTTPException
 
 from auth import verify_api_key
 from config import settings
-
-_redis = redis_lib.from_url(settings.REDIS_URL, decode_responses=True)
+from redis_client import redis as _redis
 
 
 def check_rate_limit(user_id: str = Depends(verify_api_key)) -> None:

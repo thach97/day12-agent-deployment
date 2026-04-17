@@ -1,12 +1,10 @@
 from datetime import datetime
 
-import redis as redis_lib
 from fastapi import Depends, HTTPException
 
 from auth import verify_api_key
 from config import settings
-
-_redis = redis_lib.from_url(settings.REDIS_URL, decode_responses=True)
+from redis_client import redis as _redis
 
 
 def _cost_key(user_id: str) -> str:

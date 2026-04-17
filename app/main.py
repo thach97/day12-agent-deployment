@@ -4,7 +4,6 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
-import redis as redis_lib
 from fastapi import Depends, FastAPI, HTTPException
 from langchain_core.messages import AIMessage, HumanMessage
 from pythonjsonlogger import jsonlogger
@@ -26,7 +25,7 @@ logging.root.setLevel(settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 # ── Redis client (shared, stateless) ─────────────────────────────────────────
-_redis = redis_lib.from_url(settings.REDIS_URL, decode_responses=True)
+from redis_client import redis as _redis
 
 HISTORY_TTL = 86400  # 24 h per conversation
 

@@ -1,14 +1,15 @@
 # Deployment Information
 
 ## Public URL
-https://your-agent.railway.app
+https://thach97s-agent-production.up.railway.app/
 
 ## Platform
 Railway
 
 ## Test Commands
 
+
 ### Health Check
 ```bash
-curl https://your-agent.railway.app/health
-# Expected: {"status": "ok"}
+curl https://thach97s-agent-production.up.railway.app/health
+# Expected: {"status":"ok","timestamp":...}
