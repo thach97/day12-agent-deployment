@@ -21,7 +21,7 @@ def search_flights(origin: str, destination: str) -> str:
     destination = destination.strip().title()
     
     def format_flight(flight):
-        return f"hãng bay: {flight["airline"]}, giờ khởi hành: {flight["departure"]}, giờ đến: {flight["arrival"]}, giá: {format_vnd(flight["price"])}, hạng: {flight["class"]}"
+        return f"hãng bay: {flight['airline']}, giờ khởi hành: {flight['departure']}, giờ đến: {flight['arrival']}, giá: {format_vnd(flight['price'])}, hạng: {flight['class']}"
 
     if (origin, destination) in FLIGHTS_DB:
         return f"Danh sách chuyến bay từ {origin} đến {destination}:\n{',\n'.join([format_flight(flight) for flight in FLIGHTS_DB[(origin, destination)]])}."
@@ -42,7 +42,7 @@ def search_hotels(city: str, max_price_per_night: int = 99999999) -> str:
     city = city.strip().title()
 
     def format_hotel(hotel):
-        return f"Tên khách sạn: {hotel["name"]}, số sao: {hotel["stars"]}, giá mỗi đêm: {format_vnd(hotel['price_per_night'])}, khu vực: {hotel['area']}, rating: {hotel['rating']}"
+        return f"Tên khách sạn: {hotel['name']}, số sao: {hotel['stars']}, giá mỗi đêm: {format_vnd(hotel['price_per_night'])}, khu vực: {hotel['area']}, rating: {hotel['rating']}"
 
     if city in HOTELS_DB:
         hotels = sorted([hotel for hotel in HOTELS_DB[city] if hotel["price_per_night"] <= max_price_per_night], key=lambda x: x["rating"], reverse=True)
