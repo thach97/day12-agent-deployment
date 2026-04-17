@@ -1,0 +1,8 @@
+langchain
+langchain-openai
+langgraph
+fastapi
+uvicorn[standard]
+redis
+pydantic-settings
+python-json-logger
